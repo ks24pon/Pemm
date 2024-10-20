@@ -1,0 +1,27 @@
+services:
+  app:
+    build:
+      context: ./backend
+    container_name: pemm-app
+    ports:
+      - "8080:8080"
+    # volumes:
+    #   - ./backend:/app
+    environment:
+      - GO_ENV=development
+
+  db:
+    image: mysql:8.0
+    container_name: pemm-db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: pemm
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+
+volumes:
+  db-data:
