@@ -15,4 +15,5 @@ func main() {
 	})
 	// サーバー起動
 	e.Logger.Fatal(e.Start(":8080"))
+	// テスト
 }
