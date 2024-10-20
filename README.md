@@ -32,6 +32,7 @@
 ## インフラ、クラウド
 - Docker Docker-compose
 - Terraform
+- MySQL
 - ECS、S3、CloudFront、Fargate
 
 ## その他
