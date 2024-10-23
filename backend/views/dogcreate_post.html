@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新しい投稿を作成</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 50px auto;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h1 {
+            text-align: center;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        input[type="file"] {
+            margin-bottom: 20px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>新しい投稿を作成</h1>
+        <form action="/posts" method="POST" enctype="multipart/form-data">
+            <label for="name">犬の名前</label>
+            <input type="text" id="name" name="name" placeholder="名前を入力してください" required>
+
+            <label for="description">説明</label>
+            <textarea id="description" name="description" rows="4" placeholder="説明を入力してください" required></textarea>
+
+            <label for="photo">写真をアップロード</label>
+            <input type="file" id="photo" name="photo" accept="image/*" required>
+
+            <button type="submit">投稿</button>
+        </form>
+    </div>
+</body>
+</html>
