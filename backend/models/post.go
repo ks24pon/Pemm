@@ -10,7 +10,7 @@ type Post struct {
 	// 一意の識別子
     ID uint `json:"id" gorm:"primary_key"`
 	//犬の名前(最大255文字、空にできない)
-	Name string `json:"name" gorm:"size:255:not null"`
+	Name string `json:"name" gorm:"size:255;not null"`
 	// 投稿に関する説明（Text型）
 	Description string `json:"description" gorm:"type:text"`
 	//写真のファイルパスを保存(最大255文字のファイパス)
