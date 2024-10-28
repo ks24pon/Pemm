@@ -27,5 +27,9 @@ func InitDB() {
 	log.Println("データーベース接続に成功いたしました")
 
 	// 自動マイグレーション(テーブルを自動で作成)
-	DB.AutoMigrate(&models.Post{})
+	if err := DB.AutoMigrate(&models.Post{}); err != nil {
+		log.Fatal("テーブルの自動作成に失敗しました:", err)
+	} else {
+		log.Println("テーブルのマイグレーションが成功しました")
+	}
 }
