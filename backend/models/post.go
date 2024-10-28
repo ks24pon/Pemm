@@ -18,7 +18,7 @@ type Post struct {
 	// GORMで自動的に作成日時を保存
 	CreatedAt time.Time `json:"created_at"`
 	// GORMで自動的に更新日時を保存
-	UpdateAt time.Time `json:"updated_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 	// ソフトデリート(論理削除)
 	// gorm:"index"によりデーターベースのインデックスとしても扱う
 	DeletedAt gorm.DeletedAt `gorm:"index"`
