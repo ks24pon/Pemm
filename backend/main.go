@@ -40,6 +40,7 @@ func main() {
 		// クライアントに返してレスポンスを返す
 		return c.String(http.StatusOK, "Hello,Pemm！")
 	})
+	
 	// 静的ファイルの設定
 	e.Static("/uploads", "uploads")
 	// エラーハンドリング
@@ -49,6 +50,7 @@ func main() {
 		// クライアント内部エラーが発生したら返す
 		c.String(http.StatusInternalServerError, "内部エラーが発生しました")
 	}
+
 	// 投稿画面ルート(/new)
 	e.GET("/new", func(c echo.Context) error {
 		return c.Render(http.StatusOK, "dogcreate_post.html", nil)
@@ -60,11 +62,12 @@ func main() {
 	// 編集画面
 	e.GET("/posts/:id/edit",handlers.EditPost)
 	// 編集処理
-
+	e.POST("/posts/:id/update", handlers.UpdatePost)
     // ルート一覧をターミナルに出力
     for _, route := range e.Routes() {
         log.Printf("Method: %s, Path: %s, Name: %s\n", route.Method, route.Path, route.Name)
     }
+	e.File("/favicon.ico", "favicon.ico")
 	// サーバー起動
 	e.Logger.Fatal(e.Start(":8080"))
 }

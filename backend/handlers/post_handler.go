@@ -74,22 +74,82 @@ func ListPosts(c echo.Context) error {
 		return c.String(http.StatusInternalServerError, "投稿一覧を取得できませんでした")
 	}
 	//デバッグ
-	log.Println("================取得した投稿データ",posts)
+	// log.Println("================取得した投稿データ",posts)
 	//投稿一覧をHTMLテンプレートに渡す
 	return c.Render(http.StatusOK, "dogpost_list.html", posts)
 }
 
-// 投稿編集
+// 投稿編集画面
 func EditPost(c echo.Context) error {
 	// URLからIDを取得
 	id := c.Param("id")
 	// 取得したデーターを格納
 	var post models.Post
 	// IDに該当するデーターを取得
-	if err := database.DB.First(&post, id).Error; err!= nil {
+	if err := database.DB.First(&post, id).Error; err != nil {
 		// IDが見つからなかった場合は404 Not Found
-		return c.String(http.StatusNotFound, "投��が見つかりませんでした")
+		return c.String(http.StatusNotFound, "投稿が見つかりませんでした")
 	}
 	// 編集画面表示
 	return c.Render(http.StatusOK, "dogpost_edit.html", post)
+}
+
+// 編集処理
+func UpdatePost(c echo.Context) error {
+	// URLから投稿IDを取得
+	id := c.Param("id")
+	// 取得したデータを格納
+	var post models.Post
+	// ログ
+	log.Println("更新処理開始 - 投稿ID", id)
+	// 投稿IDに該当するデータを取得
+	if err := database.DB.First(&post, id).Error; err != nil {
+		// IDが見つからなかった場合は404 Not Found
+		return c.String(http.StatusNotFound, "投稿が見つかりませんでした")
+	}
+
+	// フォームデータ取得(更新後のデータ)
+	name := c.FormValue("name")
+	description := c.FormValue("description")
+	// 入力値を投稿データに設定
+	post.Name = name
+	post.Description = description
+
+	// 写真ファイルを取得しアップロードがあれば更新
+	file, err := c.FormFile("photo")
+	// エラーが発生していない場合(画像の処理)
+	if err == nil {
+		// 取得したファイルをsrcとしてOpen
+		src, err := file.Open()
+		if err != nil {
+			return err
+		}
+		// 関数が終了時点でファイルを閉じる
+		defer src.Close()
+
+		// 保存先パスを作成
+		filePath := filepath.Join("uploads", file.Filename)
+		// filePathに新しいファイルを作成してdst変数に格納
+		dst, err := os.Create(filePath)
+		// ファイル作成失敗後にエラー返す
+		if err != nil {
+			return err
+		}
+		defer dst.Close()
+
+		// ファイル内容をコピーして保存
+		if _, err = io.Copy(dst, src); err != nil {
+			return err
+		}
+
+		// 新しい画像のパス指定
+		post.PhotoPath = file.Filename
+	}
+
+	// データベースの投稿を更新
+	if err := database.DB.Save(&post).Error; err != nil {
+		return c.String(http.StatusInternalServerError, "投稿の更新に失敗しました")
+	}
+	// 更新後、投稿の詳細画面へリダイレクト
+	return c.Redirect(http.StatusSeeOther, "/posts/"+id)
 }
