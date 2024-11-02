@@ -8,6 +8,7 @@ import (
 	"pemm/handlers"
 	"github.com/labstack/echo/v4/middleware"
 	"io"
+	"log"
 )
 
 // HTMLをレンタリングする構造体
@@ -56,7 +57,14 @@ func main() {
 	e.POST("/posts", handlers.CreatePost)
 	// 投稿一覧
 	e.GET("/index", handlers.ListPosts)
+	// 編集画面
+	e.GET("/posts/:id/edit",handlers.EditPost)
+	// 編集処理
+
+    // ルート一覧をターミナルに出力
+    for _, route := range e.Routes() {
+        log.Printf("Method: %s, Path: %s, Name: %s\n", route.Method, route.Path, route.Name)
+    }
 	// サーバー起動
 	e.Logger.Fatal(e.Start(":8080"))
-
 }

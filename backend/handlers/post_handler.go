@@ -78,3 +78,18 @@ func ListPosts(c echo.Context) error {
 	//投稿一覧をHTMLテンプレートに渡す
 	return c.Render(http.StatusOK, "dogpost_list.html", posts)
 }
+
+// 投稿編集
+func EditPost(c echo.Context) error {
+	// URLからIDを取得
+	id := c.Param("id")
+	// 取得したデーターを格納
+	var post models.Post
+	// IDに該当するデーターを取得
+	if err := database.DB.First(&post, id).Error; err!= nil {
+		// IDが見つからなかった場合は404 Not Found
+		return c.String(http.StatusNotFound, "投��が見つかりませんでした")
+	}
+	// 編集画面表示
+	return c.Render(http.StatusOK, "dogpost_edit.html", post)
+}
