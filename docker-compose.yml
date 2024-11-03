@@ -5,11 +5,17 @@ services:
     container_name: pemm-app
     ports:
       - "8080:8080"
+    volumes:
+      - ./uploads:/app/uploads
+      - ./favicon.ico:/app/favicon.ico
     # volumes:
     #   - ./backend:/app
     environment:
       - GO_ENV=development
-
+      - DB_DSN=user:password@tcp(db:3306)/pemm?charset=utf8mb4&parseTime=True&loc=Local
+    depends_on:
+      db:
+        condition: service_healthy
   db:
     image: mysql:8.0
     container_name: pemm-db
@@ -22,6 +28,12 @@ services:
       - "3306:3306"
     volumes:
       - db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-u", "root", "-prootpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  
 
 volumes:
   db-data:

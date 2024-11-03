@@ -1,26 +1,26 @@
 package main
 
 import (
-	"net/http"
-	"pemm/database"
 	"html/template"
-	"github.com/labstack/echo/v4"
-	"pemm/handlers"
-	"github.com/labstack/echo/v4/middleware"
 	"io"
 	"log"
+	"net/http"
+	"pemm/database"
+	"pemm/handlers"
+
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 // HTMLをレンタリングする構造体
 type HTMLTemplateRender struct {
 	templates *template.Template
 }
+
 // Echoとtemplateパッケージを使ってレンダリング
 func (render *HTMLTemplateRender) Render(writer io.Writer, name string, data interface{}, c echo.Context) error {
-	return  render.templates.ExecuteTemplate(writer, name, data)
+	return render.templates.ExecuteTemplate(writer, name, data)
 }
-
-
 
 func main() {
 	// データベースの初期化
@@ -28,7 +28,7 @@ func main() {
 	// 新しいEchoインスタンス生成
 	e := echo.New()
 	// テンプレートの設定
-	render := &HTMLTemplateRender {
+	render := &HTMLTemplateRender{
 		templates: template.Must(template.ParseGlob("views/*.html")),
 	}
 	e.Renderer = render
@@ -40,7 +40,7 @@ func main() {
 		// クライアントに返してレスポンスを返す
 		return c.String(http.StatusOK, "Hello,Pemm！")
 	})
-	
+
 	// 静的ファイルの設定
 	e.Static("/uploads", "uploads")
 	// エラーハンドリング
@@ -60,15 +60,17 @@ func main() {
 	// 投稿一覧
 	e.GET("/index", handlers.ListPosts)
 	// 編集画面
-	e.GET("/posts/:id/edit",handlers.EditPost)
+	e.GET("/posts/:id/edit", handlers.EditPost)
 	// 編集処理
 	e.POST("/posts/:id/update", handlers.UpdatePost)
 	// 詳細画面
 	e.GET("/posts/:id", handlers.ShowPost)
-    // ルート一覧をターミナルに出力
-    for _, route := range e.Routes() {
-        log.Printf("Method: %s, Path: %s, Name: %s\n", route.Method, route.Path, route.Name)
-    }
+	// 削除処理
+	e.POST("/posts/:id/delete", handlers.DeletePost)
+	// ルート一覧をターミナルに出力
+	for _, route := range e.Routes() {
+		log.Printf("Method: %s, Path: %s, Name: %s\n", route.Method, route.Path, route.Name)
+	}
 	e.File("/favicon.ico", "favicon.ico")
 	// サーバー起動
 	e.Logger.Fatal(e.Start(":8080"))

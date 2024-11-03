@@ -156,11 +156,30 @@ func ShowPost(c echo.Context) error {
 	id := c.Param("id")
 	// 投稿データを格納する変数を制限
 	var post models.Post
-	// データベースから投稿wp IDで検索
+	// データベースから投稿IDで検索
 	if err := database.DB.First(&post, id).Error; err != nil {
 		// IDが見つからなかった場合エラー返す
 		return c.String(http.StatusNotFound, "投稿が見つかりませんでした")
 	}
 	// 詳細ページのレンタリング、投稿データを返す
 	return c.Render(http.StatusOK, "show_post.html", post)
+}
+
+// 削除処理
+func DeletePost(c echo.Context) error {
+	// 投稿のIDをパラメータから取得
+	id := c.Param("id")
+	// 削除対象の投稿データを格納する変数を制限
+	var post models.Post
+	// データベースから投稿IDで検索
+	if err := database.DB.First(&post, id).Error; err != nil {
+		return c.String(http.StatusNotFound, "投稿が見つかりませんでした")
+	}
+	// 投稿を削除
+	if err := database.DB.Delete(&post).Error; err != nil {
+		// 削除にした場合エラーを返す
+		return c.String(http.StatusInternalServerError, "投��の削除に失��しました")
+	}
+	// 削除成功後
+	return c.Redirect(http.StatusSeeOther, "/index")
 }
