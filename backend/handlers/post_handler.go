@@ -13,8 +13,6 @@ import (
 
 // データーベースに保存する処理を行う関数
 func CreatePost(c echo.Context) error {
-	// デバッグ
-	log.Println("フォームデータ取得開始")
 	// フォームデータ取得
 	name := c.FormValue("name")
 	description := c.FormValue("description")
@@ -73,8 +71,6 @@ func ListPosts(c echo.Context) error {
 	if err := database.DB.Find(&posts).Error; err != nil {
 		return c.String(http.StatusInternalServerError, "投稿一覧を取得できませんでした")
 	}
-	//デバッグ
-	// log.Println("================取得した投稿データ",posts)
 	//投稿一覧をHTMLテンプレートに渡す
 	return c.Render(http.StatusOK, "dogpost_list.html", posts)
 }
@@ -152,4 +148,19 @@ func UpdatePost(c echo.Context) error {
 	}
 	// 更新後、投稿の詳細画面へリダイレクト
 	return c.Redirect(http.StatusSeeOther, "/posts/"+id)
+}
+
+// 詳細画面
+func ShowPost(c echo.Context) error {
+	// 投稿のIDをパラメータから取得
+	id := c.Param("id")
+	// 投稿データを格納する変数を制限
+	var post models.Post
+	// データベースから投稿wp IDで検索
+	if err := database.DB.First(&post, id).Error; err != nil {
+		// IDが見つからなかった場合エラー返す
+		return c.String(http.StatusNotFound, "投稿が見つかりませんでした")
+	}
+	// 詳細ページのレンタリング、投稿データを返す
+	return c.Render(http.StatusOK, "show_post.html", post)
 }

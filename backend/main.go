@@ -63,6 +63,8 @@ func main() {
 	e.GET("/posts/:id/edit",handlers.EditPost)
 	// 編集処理
 	e.POST("/posts/:id/update", handlers.UpdatePost)
+	// 詳細画面
+	e.GET("/posts/:id", handlers.ShowPost)
     // ルート一覧をターミナルに出力
     for _, route := range e.Routes() {
         log.Printf("Method: %s, Path: %s, Name: %s\n", route.Method, route.Path, route.Name)
