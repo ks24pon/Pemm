@@ -67,6 +67,10 @@ func main() {
 	e.GET("/posts/:id", handlers.ShowPost)
 	// 削除処理
 	e.POST("/posts/:id/delete", handlers.DeletePost)
+	// ユーザー登録画面(/register)
+	e.GET("/register", func(c echo.Context) error {
+		return c.Render(http.StatusOK, "user_register.html", nil)
+	})
 	// ルート一覧をターミナルに出力
 	for _, route := range e.Routes() {
 		log.Printf("Method: %s, Path: %s, Name: %s\n", route.Method, route.Path, route.Name)
