@@ -27,6 +27,10 @@ func main() {
 	database.InitDB()
 	// 新しいEchoインスタンス生成
 	e := echo.New()
+	// UserHandlerのインスタンス生成
+	UserHandler := &handlers.UserHandler {
+		DB: database.DB,
+	}
 	// テンプレートの設定
 	render := &HTMLTemplateRender{
 		templates: template.Must(template.ParseGlob("views/*.html")),
@@ -71,6 +75,8 @@ func main() {
 	e.GET("/register", func(c echo.Context) error {
 		return c.Render(http.StatusOK, "user_register.html", nil)
 	})
+	// ユーザー登録処理
+	e.POST("/register", UserHandler.UserRegister)
 	// ルート一覧をターミナルに出力
 	for _, route := range e.Routes() {
 		log.Printf("Method: %s, Path: %s, Name: %s\n", route.Method, route.Path, route.Name)
