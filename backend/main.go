@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"pemm/database"
 	"pemm/handlers"
-	
+	_ "github.com/gorilla/csrf"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -39,6 +39,19 @@ func main() {
 	// ミドルウェア設定
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+
+	// CSRF対策
+	e.Use(middleware.CSRFWithConfig(middleware.CSRFConfig{
+		// CSRFトークンを保存するクッキーの名前
+		CookieName: "csrf_token",
+		// フォームでトークンを受け取る方法を指定
+		TokenLookup: "form:csrf_token",
+		// クッキーをHTTPS通信のみで崇信するか
+		CookieSecure: false,
+		// クッキーをJavaScriptからアクセス不可にするかどうか
+		CookieHTTPOnly: true,
+	}))
+	
 	// ルートを定義
 	e.GET("/", func(c echo.Context) error {
 		// クライアントに返してレスポンスを返す
@@ -73,7 +86,10 @@ func main() {
 	e.POST("/posts/:id/delete", handlers.DeletePost)
 	// ユーザー登録画面(/register)
 	e.GET("/register", func(c echo.Context) error {
-		return c.Render(http.StatusOK, "user_register.html", nil)
+		data := map[string]interface{}{
+			"csrf": c.Get("csrf").(string),
+		}
+		return c.Render(http.StatusOK, "user_register.html", data)
 	})
 	// ユーザー登録処理
 	e.POST("/register", UserHandler.UserRegister)
