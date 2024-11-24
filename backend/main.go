@@ -10,6 +10,8 @@ import (
 	_ "github.com/gorilla/csrf"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"go-playground/validator/v10"
+
 )
 
 // HTMLをレンタリングする構造体
@@ -21,6 +23,16 @@ type HTMLTemplateRender struct {
 func (render *HTMLTemplateRender) Render(writer io.Writer, name string, data interface{}, c echo.Context) error {
 	return render.templates.ExecuteTemplate(writer, name, data)
 }
+
+// カスタムバリデーション #1
+type CustomValidation struct {
+	validator *validator.Validate
+}
+// カスタムバリデーション #2
+func (cv *CustomValidation) Validate(i interface{}) error {
+	return cv.validator.Struct(i)
+}
+
 
 func main() {
 	// データベースの初期化
@@ -36,9 +48,13 @@ func main() {
 		templates: template.Must(template.ParseGlob("views/*.html")),
 	}
 	e.Renderer = render
+
 	// ミドルウェア設定
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+
+	// カスタムバリデーション #3
+	validate = Validator.New()
 
 	// CSRF対策
 	e.Use(middleware.CSRFWithConfig(middleware.CSRFConfig{
