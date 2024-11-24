@@ -9,7 +9,7 @@ type User struct {
 	// 一意の識別子
 	ID uint `json:"id" gorm:"primary_key"`
 	// ユーザーの名前
-	Username string `json:"name" gorm:"size:255;not null"`
+	Username string `json:"name" gorm:"size:255;not null" validate:"min=8"`
 	// メールアドレス
 	Email string `json:"email" gorm:"size:255;unique;not null"`
 	// パスワード
