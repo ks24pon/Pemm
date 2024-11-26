@@ -52,7 +52,7 @@ func main() {
 
 	// テンプレートの設定
 	render := &HTMLTemplateRender{
-		templates: template.Must(template.ParseGlob("views/*.html")), // パスを調整
+		templates: template.Must(template.ParseGlob("views/*.html")),
 	}
 	e.Renderer = render
 
@@ -81,10 +81,12 @@ func main() {
 		CookieHTTPOnly: true,
 	}))
 
-	// ルートを定義
+	// Top画面のルート
 	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, Pemm！")
+		return c.Render(http.StatusOK, "top.html", nil)
 	})
+	// 静的ファイルの設定
+	e.Static("/static", "static")
 
 	// 静的ファイルの設定
 	e.Static("/uploads", "uploads")
