@@ -7,14 +7,13 @@ import (
 	"net/http"
 	"pemm/database"
 	"pemm/handlers"
-	_ "github.com/gorilla/csrf"
+
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"go-playground/validator/v10"
-
 )
 
-// HTMLをレンタリングする構造体
+// HTMLをレンダリングする構造体
 type HTMLTemplateRender struct {
 	templates *template.Template
 }
@@ -24,63 +23,75 @@ func (render *HTMLTemplateRender) Render(writer io.Writer, name string, data int
 	return render.templates.ExecuteTemplate(writer, name, data)
 }
 
-// カスタムバリデーション #1
+// カスタムバリデーション構造体
 type CustomValidation struct {
 	validator *validator.Validate
 }
-// カスタムバリデーション #2
+
+// カスタムバリデーション関数
 func (cv *CustomValidation) Validate(i interface{}) error {
 	return cv.validator.Struct(i)
 }
 
+// バリデーション関数(8文字以上)
+func CheckMinLength(fl validator.FieldLevel) bool {
+	return len(fl.Field().String()) >= 8
+}
 
 func main() {
 	// データベースの初期化
 	database.InitDB()
+
 	// 新しいEchoインスタンス生成
 	e := echo.New()
+
 	// UserHandlerのインスタンス生成
-	UserHandler := &handlers.UserHandler {
+	UserHandler := &handlers.UserHandler{
 		DB: database.DB,
 	}
+
 	// テンプレートの設定
 	render := &HTMLTemplateRender{
-		templates: template.Must(template.ParseGlob("views/*.html")),
+		templates: template.Must(template.ParseGlob("views/*.html")), // パスを調整
 	}
 	e.Renderer = render
+
+	// バリデーションインスタンスの作成
+	validate := validator.New()
+
+	// カスタムバリデーション登録
+	if err := validate.RegisterValidation("minlength8", CheckMinLength); err != nil {
+		log.Fatalf("カスタムバリデーションの登録に失敗しました: %v", err)
+	}
+
+	// Echoにカスタムバリデーションを登録
+	e.Validator = &CustomValidation{
+		validator: validate,
+	}
 
 	// ミドルウェア設定
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	// カスタムバリデーション #3
-	validate = Validator.New()
-
 	// CSRF対策
 	e.Use(middleware.CSRFWithConfig(middleware.CSRFConfig{
-		// CSRFトークンを保存するクッキーの名前
-		CookieName: "csrf_token",
-		// フォームでトークンを受け取る方法を指定
-		TokenLookup: "form:csrf_token",
-		// クッキーをHTTPS通信のみで崇信するか
-		CookieSecure: false,
-		// クッキーをJavaScriptからアクセス不可にするかどうか
+		CookieName:     "csrf_token",
+		TokenLookup:    "form:csrf_token",
+		CookieSecure:   false,
 		CookieHTTPOnly: true,
 	}))
-	
+
 	// ルートを定義
 	e.GET("/", func(c echo.Context) error {
-		// クライアントに返してレスポンスを返す
-		return c.String(http.StatusOK, "Hello,Pemm！")
+		return c.String(http.StatusOK, "Hello, Pemm！")
 	})
 
 	// 静的ファイルの設定
 	e.Static("/uploads", "uploads")
+
 	// エラーハンドリング
 	e.HTTPErrorHandler = func(err error, c echo.Context) {
-		// エラーが発生したことをログに記録
 		c.Logger().Error("エラーが発生しました", err)
-		// クライアント内部エラーが発生したら返す
 		c.String(http.StatusInternalServerError, "内部エラーが発生しました")
 	}
 
@@ -88,6 +99,7 @@ func main() {
 	e.GET("/new", func(c echo.Context) error {
 		return c.Render(http.StatusOK, "dogcreate_post.html", nil)
 	})
+
 	// 投稿処理
 	e.POST("/posts", handlers.CreatePost)
 	// 投稿一覧
@@ -100,6 +112,7 @@ func main() {
 	e.GET("/posts/:id", handlers.ShowPost)
 	// 削除処理
 	e.POST("/posts/:id/delete", handlers.DeletePost)
+
 	// ユーザー登録画面(/register)
 	e.GET("/register", func(c echo.Context) error {
 		data := map[string]interface{}{
@@ -107,13 +120,17 @@ func main() {
 		}
 		return c.Render(http.StatusOK, "user_register.html", data)
 	})
+
 	// ユーザー登録処理
 	e.POST("/register", UserHandler.UserRegister)
+
 	// ルート一覧をターミナルに出力
 	for _, route := range e.Routes() {
 		log.Printf("Method: %s, Path: %s, Name: %s\n", route.Method, route.Path, route.Name)
 	}
+
 	e.File("/favicon.ico", "favicon.ico")
+
 	// サーバー起動
 	e.Logger.Fatal(e.Start(":8080"))
 }
