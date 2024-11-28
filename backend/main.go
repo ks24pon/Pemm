@@ -102,6 +102,11 @@ func main() {
 		return c.Render(http.StatusOK, "dogcreate_post.html", nil)
 	})
 
+	// ニックネーム登録画面
+	e.GET("/nickname", func(c echo.Context) error {
+		return c.Render(http.StatusOK, "nickname_register.html", nil)
+	})
+
 	// 投稿処理
 	e.POST("/posts", handlers.CreatePost)
 	// 投稿一覧
