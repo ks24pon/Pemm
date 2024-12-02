@@ -50,6 +50,11 @@ func main() {
 		DB: database.DB,
 	}
 
+	// ニックネームインスタンス作成
+	PetHandler := &handlers.PetHandler{
+		DB: database.DB,
+	}
+
 	// テンプレートの設定
 	render := &HTMLTemplateRender{
 		templates: template.Must(template.ParseGlob("views/*.html")),
@@ -79,6 +84,7 @@ func main() {
 		TokenLookup:    "form:csrf_token",
 		CookieSecure:   false,
 		CookieHTTPOnly: true,
+		CookiePath:     "/",
 	}))
 
 	// Top画面のルート
@@ -100,11 +106,6 @@ func main() {
 	// 投稿画面ルート(/new)
 	e.GET("/new", func(c echo.Context) error {
 		return c.Render(http.StatusOK, "dogcreate_post.html", nil)
-	})
-
-	// ニックネーム登録画面
-	e.GET("/nickname", func(c echo.Context) error {
-		return c.Render(http.StatusOK, "nickname_register.html", nil)
 	})
 
 	// 投稿処理
@@ -130,6 +131,17 @@ func main() {
 
 	// ユーザー登録処理
 	e.POST("/register", UserHandler.UserRegister)
+
+	// ニックネーム登録画面(nickname)
+	e.GET("/nickname", func(c echo.Context) error {
+		data := map[string]interface{}{
+			"csrf": c.Get("csrf").(string),
+		}
+		return c.Render(http.StatusOK, "nickname_register.html", data)
+	})
+
+	// ニックネーム登録処理(/nickname)
+	e.POST("/nickname", PetHandler.PetRegister)
 
 	// ルート一覧をターミナルに出力
 	for _, route := range e.Routes() {
