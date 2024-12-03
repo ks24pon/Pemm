@@ -100,3 +100,151 @@
     </div>
 </body>
 </html>
+
+
+// ... existing code ...
+
+<style>
+    /* 既存のスタイルはそのままで、以下を追加 */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+    }
+
+    .modal-content {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        width: 80%;
+        max-width: 300px;
+    }
+
+    .modal-title {
+        font-size: 18px;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .modal-input {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 16px;
+    }
+
+    .modal-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+
+    .modal-button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    .cancel-button {
+        background-color: #e0e0e0;
+        color: #333;
+    }
+
+    .ok-button {
+        background-color: #228B22;
+        color: white;
+    }
+</style>
+
+<body>
+    <!-- 既存のコンテンツ -->
+    
+    <!-- メールアドレス入力モーダル -->
+    <div id="emailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">ログイン</div>
+            <div>登録済みのメールアドレスを入力してください</div>
+            <input type="email" class="modal-input" id="loginEmail" placeholder="メールアドレス">
+            <div class="modal-buttons">
+                <button class="modal-button cancel-button" onclick="closeEmailModal()">キャンセル</button>
+                <button class="modal-button ok-button" onclick="proceedToPassword()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- パスワード入力モーダル -->
+    <div id="passwordModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">ログイン</div>
+            <div>パスワードを入力してください</div>
+            <input type="password" class="modal-input" id="loginPassword" placeholder="パスワード">
+            <div class="modal-buttons">
+                <button class="modal-button cancel-button" onclick="closePasswordModal()">キャンセル</button>
+                <button class="modal-button ok-button" onclick="submitLogin()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 「すでに登録済みの方」ボタンのonclickを更新
+        document.querySelector('.secondary-button').onclick = function() {
+            document.getElementById('emailModal').style.display = 'block';
+        };
+
+        function closeEmailModal() {
+            document.getElementById('emailModal').style.display = 'none';
+        }
+
+        function closePasswordModal() {
+            document.getElementById('passwordModal').style.display = 'none';
+        }
+
+        function proceedToPassword() {
+            const email = document.getElementById('loginEmail').value;
+            if (!email) {
+                alert('メールアドレスを入力してください');
+                return;
+            }
+            document.getElementById('emailModal').style.display = 'none';
+            document.getElementById('passwordModal').style.display = 'block';
+        }
+
+        async function submitLogin() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                if (response.ok) {
+                    window.location.href = '/dashboard';
+                } else {
+                    const data = await response.json();
+                    alert(data.message || 'ログインに失敗しました');
+                }
+            } catch (error) {
+                alert('エラーが発生しました');
+            }
+        }
+    </script>
+</body>

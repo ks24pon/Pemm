@@ -7,10 +7,11 @@ import (
 	"net/http"
 	"pemm/database"
 	"pemm/handlers"
-
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/gorilla/sessions"
+    "github.com/labstack/echo-contrib/session"
 )
 
 // HTMLをレンダリングする構造体
@@ -22,6 +23,16 @@ type HTMLTemplateRender struct {
 func (render *HTMLTemplateRender) Render(writer io.Writer, name string, data interface{}, c echo.Context) error {
 	return render.templates.ExecuteTemplate(writer, name, data)
 }
+
+// セッション設定
+store := sessions.NewCookieStore([]byte("pemm-key"))
+store.Options = &sessions.Options{
+	Path: "/",
+	MaxAge: 86400 * 7,
+	HttpOnly
+
+}
+
 
 // カスタムバリデーション構造体
 type CustomValidation struct {
@@ -78,7 +89,7 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	// CSRF対策
+	// CSRF対策のミドルウェア設定
 	e.Use(middleware.CSRFWithConfig(middleware.CSRFConfig{
 		CookieName:     "csrf_token",
 		TokenLookup:    "form:csrf_token",
@@ -139,6 +150,20 @@ func main() {
 		}
 		return c.Render(http.StatusOK, "nickname_register.html", data)
 	})
+
+	 // ログイン関連のルーティング追記
+	 // ログイン画面表示
+	 e.GET("/login", func(c echo.Context) error {
+		data := map[string]interface{}{
+			"csrf": c.Get("csrf").(string),
+		}
+		return c.Render(http.StatusOK, "nickname_register.html", data)
+	 })
+	 
+	 // ログイン処理
+	 e.POST("/login", UserHandler.Login)
+
+	 // ログアウト処理(TODO)
 
 	// ニックネーム登録処理(/nickname)
 	e.POST("/nickname", PetHandler.PetRegister)
