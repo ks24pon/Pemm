@@ -7,11 +7,12 @@ import (
 	"net/http"
 	"pemm/database"
 	"pemm/handlers"
+
 	"github.com/go-playground/validator/v10"
+	"github.com/gorilla/sessions"
+	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/gorilla/sessions"
-    "github.com/labstack/echo-contrib/session"
 )
 
 // HTMLをレンダリングする構造体
@@ -22,15 +23,6 @@ type HTMLTemplateRender struct {
 // Echoとtemplateパッケージを使ってレンダリング
 func (render *HTMLTemplateRender) Render(writer io.Writer, name string, data interface{}, c echo.Context) error {
 	return render.templates.ExecuteTemplate(writer, name, data)
-}
-
-// セッション設定
-store := sessions.NewCookieStore([]byte("pemm-key"))
-store.Options = &sessions.Options{
-	Path: "/",
-	MaxAge: 86400 * 7,
-	HttpOnly
-
 }
 
 
@@ -52,43 +44,53 @@ func CheckMinLength(fl validator.FieldLevel) bool {
 func main() {
 	// データベースの初期化
 	database.InitDB()
-
+	
 	// 新しいEchoインスタンス生成
 	e := echo.New()
-
+	// セッション設定(
+	// セッションストアの設定
+	store := sessions.NewCookieStore([]byte("pemm-key"))
+	store.Options = &sessions.Options{
+		Path: "/",
+		MaxAge: 86400 * 7,
+		HttpOnly: true,
+	}
+	// セッションのミドルウェア設定
+	e.Use(session.Middleware(store))
+	
 	// UserHandlerのインスタンス生成
 	UserHandler := &handlers.UserHandler{
 		DB: database.DB,
 	}
-
+	
 	// ニックネームインスタンス作成
 	PetHandler := &handlers.PetHandler{
 		DB: database.DB,
 	}
-
+	
 	// テンプレートの設定
 	render := &HTMLTemplateRender{
 		templates: template.Must(template.ParseGlob("views/*.html")),
 	}
 	e.Renderer = render
-
+	
 	// バリデーションインスタンスの作成
 	validate := validator.New()
-
+	
 	// カスタムバリデーション登録
 	if err := validate.RegisterValidation("minlength8", CheckMinLength); err != nil {
 		log.Fatalf("カスタムバリデーションの登録に失敗しました: %v", err)
 	}
-
+	
 	// Echoにカスタムバリデーションを登録
 	e.Validator = &CustomValidation{
 		validator: validate,
 	}
-
+	
 	// ミドルウェア設定
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
-
+	
 	// CSRF対策のミドルウェア設定
 	e.Use(middleware.CSRFWithConfig(middleware.CSRFConfig{
 		CookieName:     "csrf_token",
@@ -97,7 +99,7 @@ func main() {
 		CookieHTTPOnly: true,
 		CookiePath:     "/",
 	}))
-
+	
 	// Top画面のルート
 	e.GET("/", func(c echo.Context) error {
 		return c.Render(http.StatusOK, "top.html", nil)
@@ -151,19 +153,19 @@ func main() {
 		return c.Render(http.StatusOK, "nickname_register.html", data)
 	})
 
-	 // ログイン関連のルーティング追記
-	 // ログイン画面表示
-	 e.GET("/login", func(c echo.Context) error {
+	// ログイン関連のルーティング追記
+	// ログイン画面表示
+	e.GET("/login", func(c echo.Context) error {
 		data := map[string]interface{}{
 			"csrf": c.Get("csrf").(string),
 		}
-		return c.Render(http.StatusOK, "nickname_register.html", data)
-	 })
-	 
-	 // ログイン処理
-	 e.POST("/login", UserHandler.Login)
+		return c.Render(http.StatusOK, "login.html", data)
+	})
 
-	 // ログアウト処理(TODO)
+	//  // ログイン処理
+	e.POST("/login", UserHandler.Login)
+
+	// ログアウト処理(TODO)
 
 	// ニックネーム登録処理(/nickname)
 	e.POST("/nickname", PetHandler.PetRegister)

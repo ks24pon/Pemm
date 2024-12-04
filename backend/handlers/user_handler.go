@@ -52,3 +52,37 @@ if err := h.DB.Create(&user).Error; err != nil {
 // 成功後のレスポンス
 return c.Redirect(http.StatusSeeOther, "/new")
 }
+
+// ログイン処理
+func (h *UserHandler) Login(c echo.Context) error {
+	// フォームからメールアドレスとパスワードを取得
+	email := c.FormValue("email")
+	password := c.FormValue("password")
+
+	// ユーザー情報を格納変数
+	var user models.User
+
+	// メールアドレスでユーザー検索
+	if err := h.DB.Where("email = ?", email).First(&user).Error; err != nil {
+		return c.Render(http.StatusUnauthorized, "login.html", map[string]interface{}{
+		"csrf":	c.Get("csrf").(string),
+		"message": "メールアドレスまたはパスワードが間違ってます",
+	})
+
+	// パスワード検証
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
+		return c.Render(http.StatusUnauthorized, "login.html", map[string]interface{}{
+			"csrf": c.Get("csrf").(string),
+			"message": "メールアドレスまたはパスワードが間違ってます",
+		})
+	}
+
+	// セッションの作成
+	
+
+
+
+
+
+
+}
