@@ -28,6 +28,6 @@ func (h *PetHandler) PetRegister(c echo.Context) error {
 		return c.String(http.StatusInternalServerError, "ニックネーム登録に失敗しました")
 	}
 
-	// 成功後のレスポンス
+	// 成功後のレスポンス(TODOペット画面にリダイレクト)
 	return c.Redirect(http.StatusSeeOther, "/new")
 }

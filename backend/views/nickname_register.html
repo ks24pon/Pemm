@@ -94,15 +94,12 @@
             <input type="text" name="nickname" placeholder="ニックネームを入力してください" required>
             <button type="submit">次へ進む</button>
         </form>
-        <button class="secondary-button" onclick="window.location.href='/login'">すでに登録済みの方</button>
+        <!-- <button class="secondary-button" onclick="window.location.href='/login'">すでに登録済みの方</button> -->
         <div class="link">利用規約</div>
         <div class="link">プライバシー・ポリシー</div>
     </div>
 </body>
 </html>
-
-
-// ... existing code ...
 
 <style>
     /* 既存のスタイルはそのままで、以下を追加 */
@@ -171,10 +168,9 @@
 </style>
 
 <body>
-    <!-- 既存のコンテンツ -->
     
     <!-- メールアドレス入力モーダル -->
-    <div id="emailModal" class="modal">
+    <!-- <div id="emailModal" class="modal">
         <div class="modal-content">
             <div class="modal-title">ログイン</div>
             <div>登録済みのメールアドレスを入力してください</div>
@@ -184,10 +180,10 @@
                 <button class="modal-button ok-button" onclick="proceedToPassword()">OK</button>
             </div>
         </div>
-    </div>
+    </div> -->
 
     <!-- パスワード入力モーダル -->
-    <div id="passwordModal" class="modal">
+    <!-- <div id="passwordModal" class="modal">
         <div class="modal-content">
             <div class="modal-title">ログイン</div>
             <div>パスワードを入力してください</div>
@@ -197,9 +193,9 @@
                 <button class="modal-button ok-button" onclick="submitLogin()">OK</button>
             </div>
         </div>
-    </div>
+    </div> -->
 
-    <script>
+    <!-- <script>
         // 「すでに登録済みの方」ボタンのonclickを更新
         document.querySelector('.secondary-button').onclick = function() {
             document.getElementById('emailModal').style.display = 'block';
@@ -246,5 +242,5 @@
                 alert('エラーが発生しました');
             }
         }
-    </script>
+    </script> -->
 </body>

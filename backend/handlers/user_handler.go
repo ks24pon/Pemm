@@ -6,6 +6,7 @@ import (
     "pemm/models"
     _ "pemm/database"
 	"golang.org/x/crypto/bcrypt"
+	"github.com/labstack/echo-contrib/session" 
 	"gorm.io/gorm"
 )
 
@@ -67,7 +68,8 @@ func (h *UserHandler) Login(c echo.Context) error {
 		return c.Render(http.StatusUnauthorized, "login.html", map[string]interface{}{
 		"csrf":	c.Get("csrf").(string),
 		"message": "メールアドレスまたはパスワードが間違ってます",
-	})
+		})
+	}
 
 	// パスワード検証
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
@@ -78,11 +80,21 @@ func (h *UserHandler) Login(c echo.Context) error {
 	}
 
 	// セッションの作成
-	
+	sess, err := session.Get("session", c)
 
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "セッションの取得に失敗しました")
+	}
 
+	// セッションににユーザーを保存
+	sess.Values["user_id"] = user.ID
+	sess.Values["username"] = user.Username
 
+	// セッションの保存
+	if err := sess.Save(c.Request(), c.Response()); err != nil {
+		return c.String(http.StatusInternalServerError, "セッションの保存に失敗しました")
+	}
 
-
-
+	// 成功後リダイレクト(投稿画面)
+	return c.Redirect(http.StatusSeeOther, "/new")
 }
