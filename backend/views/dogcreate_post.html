@@ -55,6 +55,7 @@
     <div class="container">
         <h1>新しい投稿を作成</h1>
         <form action="/posts" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{.csrf}}">
             <label for="name">犬の名前</label>
             <input type="text" id="name" name="name" placeholder="名前を入力してください" required>
 
