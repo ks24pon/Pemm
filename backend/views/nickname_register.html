@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ニックネーム登録</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f9f9f9;
+        }
+
+        h1 {
+            color: #228B22;
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        p {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 24px;
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .form-container input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .form-container button {
+            width: 100%;
+            padding: 10px;
+            background-color: #228B22;
+            color: white;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .form-container button:hover {
+            background-color: #228B22;
+        }
+
+        .secondary-button {
+            width: 100%;
+            padding: 10px;
+            background-color: #e0e0e0;
+            color: #333;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .secondary-button:hover {
+            background-color: #c0c0c0;
+        }
+
+        .link {
+            font-size: 14px;
+            color: #666;
+            margin-top: 20px;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>お名前を登録しよう</h1>
+    <p>1/3 ステップ</p>
+
+    <div class="form-container">
+        <form method="POST" action="/nickname">
+            <input type="hidden" name="csrf_token" value="{{ .csrf }}">
+            <input type="text" name="nickname" placeholder="ニックネームを入力してください" required>
+            <button type="submit">次へ進む</button>
+        </form>
+        <!-- <button class="secondary-button" onclick="window.location.href='/login'">すでに登録済みの方</button> -->
+        <div class="link">利用規約</div>
+        <div class="link">プライバシー・ポリシー</div>
+    </div>
+</body>
+</html>
+
+<style>
+    /* 既存のスタイルはそのままで、以下を追加 */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+    }
+
+    .modal-content {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        width: 80%;
+        max-width: 300px;
+    }
+
+    .modal-title {
+        font-size: 18px;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .modal-input {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 16px;
+    }
+
+    .modal-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+
+    .modal-button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    .cancel-button {
+        background-color: #e0e0e0;
+        color: #333;
+    }
+
+    .ok-button {
+        background-color: #228B22;
+        color: white;
+    }
+</style>
+
+<body>
+    
+    <!-- メールアドレス入力モーダル -->
+    <!-- <div id="emailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">ログイン</div>
+            <div>登録済みのメールアドレスを入力してください</div>
+            <input type="email" class="modal-input" id="loginEmail" placeholder="メールアドレス">
+            <div class="modal-buttons">
+                <button class="modal-button cancel-button" onclick="closeEmailModal()">キャンセル</button>
+                <button class="modal-button ok-button" onclick="proceedToPassword()">OK</button>
+            </div>
+        </div>
+    </div> -->
+
+    <!-- パスワード入力モーダル -->
+    <!-- <div id="passwordModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">ログイン</div>
+            <div>パスワードを入力してください</div>
+            <input type="password" class="modal-input" id="loginPassword" placeholder="パスワード">
+            <div class="modal-buttons">
+                <button class="modal-button cancel-button" onclick="closePasswordModal()">キャンセル</button>
+                <button class="modal-button ok-button" onclick="submitLogin()">OK</button>
+            </div>
+        </div>
+    </div> -->
+
+    <!-- <script>
+        // 「すでに登録済みの方」ボタンのonclickを更新
+        document.querySelector('.secondary-button').onclick = function() {
+            document.getElementById('emailModal').style.display = 'block';
+        };
+
+        function closeEmailModal() {
+            document.getElementById('emailModal').style.display = 'none';
+        }
+
+        function closePasswordModal() {
+            document.getElementById('passwordModal').style.display = 'none';
+        }
+
+        function proceedToPassword() {
+            const email = document.getElementById('loginEmail').value;
+            if (!email) {
+                alert('メールアドレスを入力してください');
+                return;
+            }
+            document.getElementById('emailModal').style.display = 'none';
+            document.getElementById('passwordModal').style.display = 'block';
+        }
+
+        async function submitLogin() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                if (response.ok) {
+                    window.location.href = '/dashboard';
+                } else {
+                    const data = await response.json();
+                    alert(data.message || 'ログインに失敗しました');
+                }
+            } catch (error) {
+                alert('エラーが発生しました');
+            }
+        }
+    </script> -->
+</body>
