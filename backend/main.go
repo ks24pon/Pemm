@@ -148,6 +148,16 @@ func main() {
 	// ニックネーム登録処理(/nickname)
 	e.POST("/nickname", PetHandler.PetRegister)
 
+	// ペット登録画面(/pet/register)
+	e.GET("/pet/register",func(c echo.Context) error {
+		data := map[string]interface{}{
+			"csrf": c.Get("csrf").(string),
+		}
+		return c.Render(http.StatusOK, "pet_register.html", data)
+	})
+
+	// ペット登録処理
+
 	// ルート一覧をターミナルに出力
 	for _, route := range e.Routes() {
 		log.Printf("Method: %s, Path: %s, Name: %s\n", route.Method, route.Path, route.Name)
