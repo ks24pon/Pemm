@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ペットを登録しましょう</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #fff;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #4CAF50;  /* グリーンカラー */
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .step {
+            text-align: center;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .note {
+            text-align: center;
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 30px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 16px;
+        }
+        
+        input[type="text"],
+        input[type="date"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-bottom: 1px solid #ddd;
+            font-size: 16px;
+            outline: none;
+        }
+
+        /* ラジオボタンのカスタマイズ */
+        .gender-group {
+            display: flex;
+            gap: 40px;
+            margin: 20px 0;
+        }
+
+        .gender-option {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .gender-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .radio-custom {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #ccc;
+            border-radius: 50%;
+            display: inline-block;
+            position: relative;
+        }
+
+        .gender-option input[type="radio"]:checked + .radio-custom {
+            border-color: #4CAF50;  /* グリーンカラー */
+        }
+
+        .gender-option input[type="radio"]:checked + .radio-custom::after {
+            content: '';
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #4CAF50;  /* グリーンカラー */
+        }
+
+        .gender-label {
+            font-size: 16px;
+            color: #333;
+        }
+        
+        .submit-button {
+            width: 100%;
+            padding: 15px;
+            background-color: #999;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+        
+        .skip-button {
+            width: 100%;
+            text-align: center;
+            color: #666;
+            text-decoration: none;
+            padding: 10px 0;
+            display: block;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ペットを登録しましょう</h1>
+        <div class="step">2/3 ステップ</div>
+        <div class="note">※ペットの情報は後で変更できます</div>
+        
+        <form method="POST" action="/pet/register">
+            <input type="hidden" name="csrf_token" value="{{.csrf}}">
+            
+            <div class="form-group">
+                <label>ペットの名前</label>
+                <input type="text" name="name" required>
+            </div>
+            
+            <div class="form-group">
+                <label>種類</label>
+                <input type="text" name="pettype" required>
+            </div>
+            
+            <div class="form-group">
+                <label>種別</label>
+                <select name="breed" required>
+                    <option value="">選択してください</option>
+                    <option value="dog">犬</option>
+                    <option value="cat">猫</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>性別</label>
+                <div class="gender-group">
+                    <label class="gender-option">
+                        <input type="radio" name="gender" value="male" required>
+                        <span class="radio-custom"></span>
+                        <span class="gender-label">オス</span>
+                    </label>
+                    <label class="gender-option">
+                        <input type="radio" name="gender" value="female" required>
+                        <span class="radio-custom"></span>
+                        <span class="gender-label">メス</span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>誕生日</label>
+                <input type="date" name="birthdate">
+            </div>
+            
+            <button type="submit" class="submit-button">登録して次へ</button>
+        </form>
+        
+        <a href="/skip-pet" class="skip-button">スキップ</a>
+    </div>
+</body>
+</html>

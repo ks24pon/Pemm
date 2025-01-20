@@ -55,6 +55,11 @@ func main() {
 		DB: database.DB,
 	}
 
+	// ペット詳細ハンドラーのインスタンス作成
+	PetDetailHandler := &handlers.PetDetailHandler{
+		DB: database.DB,
+	}
+
 	// テンプレートの設定
 	render := &HTMLTemplateRender{
 		templates: template.Must(template.ParseGlob("views/*.html")),
@@ -157,6 +162,7 @@ func main() {
 	})
 
 	// ペット登録処理
+	e.POST("/pet/register", PetDetailHandler.PetDetail)
 
 	// ルート一覧をターミナルに出力
 	for _, route := range e.Routes() {
