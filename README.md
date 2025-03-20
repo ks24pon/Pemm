@@ -26,8 +26,8 @@
 ## フロントエンド
 - HTML,CSS
 - Tailwind css
-- Next.js
-- TypeScript
+- JavaScript
+- React.js
 
 ## インフラ、クラウド
 - Docker Docker-compose
