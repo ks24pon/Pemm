@@ -1,0 +1,77 @@
+    <!-- 既存のコンテンツ -->
+    
+    <!-- メールアドレス入力モーダル -->
+    <div id="emailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">ログイン</div>
+            <div>登録済みのメールアドレスを入力してください</div>
+            <input type="email" class="modal-input" id="loginEmail" placeholder="メールアドレス">
+            <div class="modal-buttons">
+                <button class="modal-button cancel-button" onclick="closeEmailModal()">キャンセル</button>
+                <button class="modal-button ok-button" onclick="proceedToPassword()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- パスワード入力モーダル -->
+    <div id="passwordModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">ログイン</div>
+            <div>パスワードを入力してください</div>
+            <input type="password" class="modal-input" id="loginPassword" placeholder="パスワード">
+            <div class="modal-buttons">
+                <button class="modal-button cancel-button" onclick="closePasswordModal()">キャンセル</button>
+                <button class="modal-button ok-button" onclick="submitLogin()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 「すでに登録済みの方」ボタンのonclickを更新
+        document.querySelector('.secondary-button').onclick = function() {
+            document.getElementById('emailModal').style.display = 'block';
+        };
+
+        function closeEmailModal() {
+            document.getElementById('emailModal').style.display = 'none';
+        }
+
+        function closePasswordModal() {
+            document.getElementById('passwordModal').style.display = 'none';
+        }
+
+        function proceedToPassword() {
+            const email = document.getElementById('loginEmail').value;
+            if (!email) {
+                alert('メールアドレスを入力してください');
+                return;
+            }
+            document.getElementById('emailModal').style.display = 'none';
+            document.getElementById('passwordModal').style.display = 'block';
+        }
+
+        async function submitLogin() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                if (response.ok) {
+                    window.location.href = '/dashboard';
+                } else {
+                    const data = await response.json();
+                    alert(data.message || 'ログインに失敗しました');
+                }
+            } catch (error) {
+                alert('エラーが発生しました');
+            }
+        }
+    </script>
+</body>

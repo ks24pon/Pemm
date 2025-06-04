@@ -3,10 +3,11 @@ package handlers
 import (
 	"net/http"
 	"pemm/models"
+
+	// "time"
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
-
 
 // ニックネームの処理
 type PetHandler struct {
@@ -19,7 +20,7 @@ func (h *PetHandler) PetRegister(c echo.Context) error {
 	nickname := c.FormValue("nickname")
 
 	// ペットオブジェクト作成
-	pet := models.Pet {
+	pet := models.Pet{
 		Nickname: nickname,
 	}
 
@@ -29,5 +30,5 @@ func (h *PetHandler) PetRegister(c echo.Context) error {
 	}
 
 	// 成功後のレスポンス(TODOペット画面にリダイレクト)
-	return c.Redirect(http.StatusSeeOther, "/new")
+	return c.Redirect(http.StatusSeeOther, "/pet/register")
 }
