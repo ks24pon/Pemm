@@ -1,12 +1,13 @@
 package handlers
 
 import (
-    "net/http"
-    "github.com/labstack/echo/v4"
-    "pemm/models"
-    _ "pemm/database"
+	"net/http"
+	_ "pemm/database"
+	"pemm/models"
+
+	"github.com/labstack/echo-contrib/session"
+	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
-	"github.com/labstack/echo-contrib/session" 
 	"gorm.io/gorm"
 )
 
@@ -30,7 +31,10 @@ func (h *UserHandler) UserRegister(c echo.Context) error {
 	// フォームデータを取得
 	username := c.FormValue("username")
 	email := c.FormValue("email")
+	// # pass
 	password := c.FormValue("password")
+	// TEST
+	// kass := c.FormValue("test")
 
 	// パスワードハッシュ化
 	hashedPassword, err := HashPassword(password)
@@ -38,20 +42,19 @@ func (h *UserHandler) UserRegister(c echo.Context) error {
 		return c.String(http.StatusInternalServerError, "パスワードのハッシュ化に失敗しました")
 	}
 
-// ユーザーオブジェクト作成
-user := models.User {
-	Username: username,
-	Email:		email,
-	Password: hashedPassword,
-}
+	// ユーザーオブジェクト作成
+	user := models.User{
+		Username: username,
+		Email:    email,
+		Password: hashedPassword,
+	}
 
-
-// データーベースに保存
-if err := h.DB.Create(&user).Error; err != nil {
-	return c.String(http.StatusInternalServerError, "ユーザー登録に失敗しました")
-}
-// 成功後のレスポンス
-return c.Redirect(http.StatusSeeOther, "/new")
+	// データーベースに保存
+	if err := h.DB.Create(&user).Error; err != nil {
+		return c.String(http.StatusInternalServerError, "ユーザー登録に失敗しました")
+	}
+	// 成功後のレスポンス
+	return c.Redirect(http.StatusSeeOther, "/new")
 }
 
 // ログイン処理
@@ -66,15 +69,15 @@ func (h *UserHandler) Login(c echo.Context) error {
 	// メールアドレスでユーザー検索
 	if err := h.DB.Where("email = ?", email).First(&user).Error; err != nil {
 		return c.Render(http.StatusUnauthorized, "login.html", map[string]interface{}{
-		"csrf":	c.Get("csrf").(string),
-		"message": "メールアドレスまたはパスワードが間違ってます",
+			"csrf":    c.Get("csrf").(string),
+			"message": "メールアドレスまたはパスワードが間違ってます",
 		})
 	}
 
 	// パスワード検証
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
 		return c.Render(http.StatusUnauthorized, "login.html", map[string]interface{}{
-			"csrf": c.Get("csrf").(string),
+			"csrf":    c.Get("csrf").(string),
 			"message": "メールアドレスまたはパスワードが間違ってます",
 		})
 	}

@@ -56,9 +56,9 @@ func main() {
 	}
 
 	// ペット詳細ハンドラーのインスタンス作成
-	PetDetailHandler := &handlers.PetDetailHandler{
-		DB: database.DB,
-	}
+	// PetDetailHandler := &handlers.PetDetailHandler{
+	// 	DB: database.DB,
+	// }
 
 	// テンプレートの設定
 	render := &HTMLTemplateRender{
@@ -155,14 +155,16 @@ func main() {
 
 	// ペット登録画面(/pet/register)
 	e.GET("/pet/register",func(c echo.Context) error {
+		nickname := c.QueryParam("nickname")
 		data := map[string]interface{}{
 			"csrf": c.Get("csrf").(string),
+			"nickname": nickname,
 		}
 		return c.Render(http.StatusOK, "pet_register.html", data)
 	})
 
 	// ペット登録処理
-	e.POST("/pet/register", PetDetailHandler.PetDetail)
+	// e.POST("/pet/register", PetDetailHandler.PetDetail)
 
 	// ルート一覧をターミナルに出力
 	for _, route := range e.Routes() {
