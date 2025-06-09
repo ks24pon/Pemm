@@ -178,6 +178,11 @@ func main() {
 		log.Printf("Method: %s, Path: %s, Name: %s\n", route.Method, route.Path, route.Name)
 	}
 
+	// ペット登録スキップ処理
+	e.GET("/skip-pet",func(c echo.Context) error {
+		return c.Redirect(http.StatusSeeOther, "/index")
+	})
+
 	e.File("/favicon.ico", "favicon.ico")
 
 	// サーバー起動
