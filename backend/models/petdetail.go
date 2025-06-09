@@ -12,7 +12,7 @@ type PetDetail struct {
 	// ペット名前
 	Name string `gorm:"size:255;not null" validate:"required"`
 	// ペット種類
-	PetType string `gorm:"size:255;not null" validate:"required"`
+	Pettype string `gorm:"size:255;not null" validate:"required"`
 	// ペット種別
 	Breed string `gorm:"size:255;not null" validate:"required"`
 	// 性別

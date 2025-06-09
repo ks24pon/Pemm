@@ -54,6 +54,10 @@ func main() {
 	PetHandler := &handlers.PetHandler{
 		DB: database.DB,
 	}
+	// ペット登録のインスタンス作成
+	// PetDetailHandler := &handlers.PetDetailHandler{
+	// 	DB: database.DB,
+	// }
 
 	// ペット詳細ハンドラーのインスタンス作成
 	// PetDetailHandler := &handlers.PetDetailHandler{
@@ -162,6 +166,9 @@ func main() {
 		}
 		return c.Render(http.StatusOK, "pet_register.html", data)
 	})
+
+	// ペット登録処理
+	// e.POST("/pet/register", PetDetailHandler.PetDetail)
 
 	// ペット登録処理
 	// e.POST("/pet/register", PetDetailHandler.PetDetail)
